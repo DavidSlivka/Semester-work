@@ -2,6 +2,8 @@
 
 import matplotlib.pyplot as plt
 import time
+import sys
+import optparse
 
 from nearest_neighbour import nearest_neighbour
 from cheapest_link import cheapest_link
@@ -11,21 +13,34 @@ from helper_functions import return_path_from_sequence_pairs, calculate_distance
 
 
 if __name__ == "__main__":
-    file = ''
-    number_of_vertices = 25
+    parser = optparse.OptionParser()
+    parser.add_option('--file', dest='file',
+                      help='File that contains coordinates of the vertices')
+    parser.add_option('--random', dest='random',
+                      help='Number of vertices that should be generated')
 
-    # open file or generate vertices
-    if file != '':
+    options, args = parser.parse_args()
+
+    try:
+        sys.argv[1]
+    except IndexError:  # no arguments give, print --help
+        parser.print_help()
+        quit()
+
+    if options.file:
+        file = options.file
         vertices = []
         with open(file, 'r') as f:
             for index, line in enumerate(f):
                 x, y = line.split(', ')
                 vertices.append(Vertex(index, int(x), int(y)))
-
         graph = Graph(len(vertices), vertices)
-    elif number_of_vertices is not None:
-        graph = Graph(number_of_vertices)
+
+    elif options.random:
+        graph = Graph(int(options.random))
+
     else:
+        parser.print_help()
         quit()
 
     times = []
